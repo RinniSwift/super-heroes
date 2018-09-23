@@ -30,8 +30,8 @@ class Armor:
 		self.defense = defense
 
 	def defend(self):
-		defend = random.randint(0, self.defense)
-		return defend
+		random_value = random.randint(0, self.defense)
+		return random_value
 		
 
 class Hero:
@@ -41,25 +41,48 @@ class Hero:
 		self.name = name
 
 		self.armors = list()
-		self.health = health
 		self.start_health = health
+		self.health = health
 		self.deaths = 0
-		self.killed = 0
+		self.kills = 0
+
+	def __str__(self):
+		return self.name
 
 	def defend(self):
 		total_defense = 0
-		for i in self.armors:
-			total_defense += i.defend()
-		if self.health == 0:
+
+		if len(self.armors) == 0:
 			return 0
 
-	def take_damage(self, damage_amt):
-		self.health -= damage_amt
+		for i in self.armors:
+			total_defense += i.defend()
+
 		if self.health == 0:
+			total_defense = 0
+			return total_defense
+		else:
+			return total_defense
+
+	def add_armor(self, name):
+		self.armors.append(name)
+
+
+
+
+
+	def take_damage(self, damage_amt):
+		self.health = self.health - damage_amt
+		if self.health <= 0:
 			self.deaths += 1
+		else:
+			return 0
 
 	def add_kill(self, num_kills):
-		self.killed += num_kills
+		self.kills += num_kills
+
+
+		
 
 	def __str__(self):
 		return self.name
@@ -112,33 +135,41 @@ class Team():
 
 	def attack(self, other_team):
 		total_attack_strength = 0
-		for i in self.heroes:
-			total_attack_strength += i.attack()
+		for hero in self.heroes:
+			total_attack_strength += hero.attack()
+			killed_heroes = other_team.defend(total_attack_strength)
 
-		total_kills = other_team.defend(total_attack_strength)
+
 
 		for hero in self.heroes:
-			hero.add_kill(total_kills)
+			hero.add_kill(killed_heroes)
 
 	def defend(self, damage_amt):
 		total_defense = 0
 		for hero in self.heroes:
 			total_defense += hero.defend()
-			if damage_amt > total_defense:
-				excess_damage = damage_amt - total_defense
-				num_kills = self.deal_damage(excess_damage)
+
+		if damage_amt > total_defense:
+			excess_damage = damage_amt - total_defense
+			num_kills = self.deal_damage(excess_damage)
 		return num_kills
 
 
 	def deal_damage(self, damage):
 
-		individual_damage = damage // len(self.heroes)
+		if len(self.heroes) != 0:
+			individual_damage = damage // len(self.heroes)
+		else:
+			return 0
+
 		dead_heroes = 0
 		for hero in self.heroes:
-			if individual_damage > hero.health:
-				dead_heroes += 1
+			if hero.health > individual_damage:
+				hero.take_damage(individual_damage)
 			else:
-				hero.health -= individual_damage
+				hero.take_damage(individual_damage)
+				dead_heroes += 1
+		return dead_heroes
 
 
 
@@ -146,27 +177,20 @@ class Team():
 
 	def revive_heroes(self, health=100):
 		for hero in self.heroes:
-			hero.health = self.health
+			hero.health = hero.start_health
+
 
 	def stats(self):
-		for hero in self.heroes:
-			kills = hero.killed 
-			deaths = hero.deaths
-			print("ratio of kills to deaths is " + kills + ":" + deaths)
+		# for hero in self.heroes:
+		# 	kills = hero.killed 
+		# 	deaths = hero.deaths
+		# 	print("ratio of kills to deaths is {}:{}".format(kills, deaths))
+
+		print("ratio of kills to deaths is {}:{}".format(self.kills, self.deaths))
 
 	def update_kills(self):
 		for hero in self.heroes:
-			hero.killed += 1
-
-
-
-
-
-
-
-
-
-
+			hero.kills += 1
 
 
 
