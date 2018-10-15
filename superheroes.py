@@ -193,19 +193,84 @@ class Team():
 			hero.kills += 1
 
 
+class Arena:
+
+	def __init__(self):
+		self.team_one = None
+		self.team_two = None
+
+	def build_team_one(self):
+		self.team_one = Team(input("Input team one name: "))
+
+
+	def build_team_two(self):
+		self.team_two = Team(input("Input team two name: "))
+
+	def team_battle(self):
+		running = True
+		while running:
+			deaths_team_one = 0
+			for hero in self.team_one.heroes:
+				if hero.health <= 0:
+					deaths_team_one += 1
+			self.team_one.attack(self.team_two)
+			if deaths_team_one == len(self.team_one.heroes):
+				running = False
+
+			deaths_team_two = 0
+			for hero in self.team_two.heroes:
+				if hero.health <= 0:
+					deaths_team_two += 1
+
+			self.team_two.attack(self.team_one)
+			if deaths_team_two == len(self.team_two.heroes):
+				running = False
+
+	def show_stats(self):
+		for hero in self.team_one:
+			print("{} kill to death ratio is {}:{}".format(self.name, self.kills, self.deaths))
+
+		for hero in self.team_two:
+			print("{} kill to death ratio is {}:{}".format(self.name, self.kills, self.deaths))
+
+
+
 
 
 if __name__ == "__main__":
-	hero = Hero("wonder woman")
-	print(hero.attack())
-	ability = Ability("Divine Speed", 6)
-	hero.add_ability(ability)
-	print(hero.attack())
+	# hero = Hero("wonder woman")
+	# print(hero.attack())
+	# ability = Ability("Divine Speed", 6)
+	# hero.add_ability(ability)
+	# print(hero.attack())
 
 
-	new_ability = Ability("super human strength", 5)
-	hero.add_ability(new_ability)
-	print(hero.attack())
+	# new_ability = Ability("super human strength", 5)
+	# hero.add_ability(new_ability)
+	# print(hero.attack())
+
+	game_is_running = True
+
+	arena = Arena()
+
+	arena.build_team_one()
+	arena.build_team_two()
+
+	while game_is_running:
+		arena.team_battle()
+		arena.show_stats()
+		play_again = input("Play again? Y or N: ")
+
+		if play_again.lower() == "n":
+			game_is_running = False
+
+		else:
+			# revive heroes to play again
+			arena.team_one.revive_heroes()
+			arena.team_two.revive_heroes()
+
+
+
 
 
 
